@@ -1,11 +1,13 @@
+import os
+from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, DeclarativeBase
 
-# Hide in separate file
+load_dotenv()
 
-SERVER_NAME = r"localhost"
-DATABASE_NAME = "deliveries"
-DRIVER_NAME = "ODBC Driver 17 for SQL Server"
+SERVER_NAME = os.getenv("DB_SERVER_NAME")
+DATABASE_NAME = os.getenv("DB_DATABASE_NAME")
+DRIVER_NAME = os.getenv("DB_DRIVER_NAME")
 
 SQLALCHEMY_DATABASE_URL = (
     f"mssql+pyodbc://{SERVER_NAME}/{DATABASE_NAME}"
