@@ -1,5 +1,5 @@
 from sqlalchemy.orm import relationship
-from sqlalchemy import Column, Integer, Float, Unicode, DateTime, Boolean, ForeignKey
+from sqlalchemy import Column, Integer, Float, Unicode, DateTime, Time, Boolean, ForeignKey
 from db.database import Base
 
 
@@ -11,8 +11,8 @@ class Shop(Base):
     latitude = Column(Float(precision=8, decimal_return_scale=6))
     longitude = Column(Float(precision=9, decimal_return_scale=6))
     address = Column(Unicode)
-    openingTime = Column(DateTime)
-    closingTime = Column(DateTime)
+    openingTime = Column(Time)
+    closingTime = Column(Time)
     orders = relationship("Order", back_populates="shop")
 
 
@@ -30,8 +30,8 @@ class Order(Base):
     __tablename__ = "orders"
     orderId = Column(Integer, primary_key=True, autoincrement=True, index=True)
     shopId = Column(Integer, ForeignKey("shops.shopId"))
-    driverId = Column(Integer, ForeignKey("drivers.driverId"))
-    type = Column(Integer)  # 0 - well-structured, 1 - express, 2 - no time limit, 3 - invalid info
+    driverId = Column(Integer, ForeignKey("drivers.driverId"), nullable=True)
+    type = Column(Integer)  # 0 - well-structured, 1 - one-sided, 2 - express, 3 - no time limit, 4 - invalid info
     initTime = Column(DateTime)
     startTime = Column(DateTime)
     endTime = Column(DateTime)
