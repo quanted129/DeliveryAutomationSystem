@@ -1,5 +1,6 @@
 from schemas.input_schemas import FormOrderInput
 from db.classes import Shop
+from services.geocoder import geocode_address, GeocodingError
 from datetime import datetime
 from math import sqrt # TEMP
 
@@ -28,7 +29,10 @@ def validate_and_prepare_order(order_request: FormOrderInput, db_session) -> dic
         raise ValidationError(f"Shop ID {order_request.shopId} does not exist.")
 
     inittime = datetime.now()
-    order_lat, order_lon = mock_geocode(order_request.address)
+    try:
+        order_lat, order_lon = geocode_address(order_request.address)
+    except GeocodingError as e:
+        raise ValidationError(f"Geocoding failed: {str(e)}")
     distance = mock_calculate_distance(shop.latitude, shop.longitude, order_lat, order_lon)
 
     # if order_request.endTime < shop.openingTime + route.time or if order_request.endTime < inittime + route.time
@@ -53,13 +57,7 @@ def validate_and_prepare_order(order_request: FormOrderInput, db_session) -> dic
     }
 
 
-def mock_geocode(address: str):
-    """Temporary mock-function for geocoding"""
-    # placeholder Minsk central coordinates
-    return 53.902284, 27.561831
-
-
 def mock_calculate_distance(lat1, lon1, lat2, lon2):
-    """Temporaty mock_function for distance calculation"""
+    """Temporary mock function for distance calculation"""
     # the distance will be larger than straight-line, calculated by OSM
     return sqrt((lat1 - lat2) ** 2 + (lon1 - lon2) ** 2) * 111
