@@ -33,6 +33,8 @@ class Order(Base):
     driverId = Column(Integer, ForeignKey("drivers.driverId"), nullable=True)
     type = Column(Integer)  # 0 - well-structured, 1 - one-sided, 2 - express, 3 - no time limit, 4 - invalid info
     status = Column(Integer, default=0)  # 0 - pending, 1 - assigned, 2 - en route, 3 - delivered, 4 - cancelled
+    eta = Column(DateTime)
+    routeSequence = Column(Integer)
     initTime = Column(DateTime)
     startTime = Column(DateTime)
     endTime = Column(DateTime)

@@ -16,7 +16,7 @@ class FormOrderInput(BaseModel):
     def is_end_after_start(cls, end: datetime, values):
         """Check if interval's start time is before the end time"""
         if end <= values.data['startTime']:
-            raise ValueError(f'Interval\'s end time ({end}) must be after the start time ({values.data['startTime']})!')
+            raise ValueError(f"Interval's end time ({end}) must be after the start time ({values.data['startTime']})!")
         return end
 
     # To-do:

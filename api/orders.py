@@ -7,6 +7,7 @@ from schemas.input_schemas import FormOrderInput
 from schemas.output_schemas import OrderOutput
 from schemas.validation_schemas import OrderCreationResponse, ValidationIssue
 from services.data_validator import validate_and_prepare_order, ValidationError
+from pydantic import BaseModel
 
 
 router = APIRouter()
@@ -46,3 +47,22 @@ def create_new_order(raw_order: FormOrderInput, db: DbSession):
             field="general", severity="error", message=str(e), suggestion="Check input fields."
         ))
         return OrderCreationResponse(success=False, issues=issues)
+
+
+class StatusUpdateRequest(BaseModel):
+    order_id: int
+    new_status: int  # will receive 2 or 3 externally
+
+
+@router.patch("/update-status")
+def update_order_status(request: StatusUpdateRequest, db: DbSession):
+    order = db.query(Order).filter(Order.orderId == request.order_id).first()
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+
+    order.status = request.new_status
+    if request.new_status in [3, 4]:
+        order.routeSequence = None
+
+    db.commit()
+    return {"message": f"Order {order.orderId} status updated to {request.new_status}"}
