@@ -1,0 +1,30 @@
+services:
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - .:/app
+
+  db:
+    image: mcr.microsoft.com/mssql/server:2025-latest
+    ports:
+      - "1433:1433"
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=QWERTY123456!@#$%^
+    volumes:
+      - sql_data:/var/opt/mssql
+    healthcheck:
+      test: /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'QWERTY123456!@#$%^' -C -Q "SELECT 1" || exit 1
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+volumes:
+  sql_data:
